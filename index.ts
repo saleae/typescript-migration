@@ -1,4 +1,4 @@
-import { DeepCurrent } from "./model";
+import { DeepCurrent, OldMinusNew, Current } from "./model";
 
 // Define initial type and sub types
 interface V1 {
@@ -27,10 +27,13 @@ const initialConfig: V1 = {
 
 // Define the changes as the delth between V1 and V2
 interface DeltaV2 {
-  version: string;
+  version: never;
   numChannels: {
     analog: number;
     digital: number;
+    meta: {
+      label: string;
+    };
   };
 }
 
@@ -43,15 +46,40 @@ type V2 = DeepCurrent<V1, DeltaV2>;
  * @returns {V2} a new V2 config
  */
 const initialToV2 = (config: V1): V2 => {
+  const { version, ...rest } = config;
   return {
-    ...config,
-    version: [config.version.major, config.version.minor].join("."),
+    ...rest,
     numChannels: {
       analog: 0,
-      digital: 0
+      digital: 0,
+      meta: {
+        label: "hi"
+      }
+    }
+  };
+};
+
+interface DeltaV3 {
+  numChannels: {
+    meta: {
+      label: number;
+    };
+  };
+}
+
+type V3 = DeepCurrent<V2, DeltaV3>;
+
+const v2ToV3 = (config: V2): V3 => {
+  return {
+    ...config,
+    numChannels: {
+      ...config.numChannels,
+      meta: {
+        label: 1
+      }
     }
   };
 };
 
 // display the result
-console.log(initialToV2(initialConfig));
+console.log(v2ToV3(initialToV2(initialConfig)));
