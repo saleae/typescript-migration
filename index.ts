@@ -39,7 +39,7 @@ type V2 = DeepCurrent<V1, DeltaV2>;
 
 /**
  * Transform a V1 config into a V2 config
- * @param config {V1} config
+ * @param {V1} config config
  * @returns {V2} a new V2 config
  */
 const initialToV2 = (config: V1): V2 => {
