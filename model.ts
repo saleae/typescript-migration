@@ -1,26 +1,3 @@
-type New<Change> = {
-  [C in keyof Change]: Change[C];
-};
-
-export type OldMinusNew<Initial, Change> = {
-  [D in Exclude<keyof Initial, keyof Change>]: Initial[D];
-};
-
-type NotNever<T> = Omit<T, JustNeverKeys<T>>;
-type JustNeverKeys<T> = {
-  [P in keyof T]: T[P] extends never ? P : never;
-}[keyof T];
-
-/**
- * Shallow union Initial and Change giving Change prioirty.
- *
- * If the type is defined on both Intial and Change the type from
- * change will be used.
- */
-export type Current<Initial, Change> = NotNever<
-  OldMinusNew<Initial, Change> & Change
->;
-
 /**
  * Deep union types Initial and Change and give priority to Change.
  *
@@ -49,3 +26,22 @@ export type DeepCurrent<Initial, Change> = {
     ? Initial[KEY]
     : never;
 };
+
+/**
+ * Shallow union Initial and Change giving Change prioirty.
+ *
+ * If the type is defined on both Intial and Change the type from
+ * change will be used.
+ */
+export type Current<Initial, Change> = NotNever<
+  OldMinusNew<Initial, Change> & Change
+>;
+
+export type OldMinusNew<Initial, Change> = {
+  [D in Exclude<keyof Initial, keyof Change>]: Initial[D];
+};
+
+type NotNever<T> = Omit<T, JustNeverKeys<T>>;
+type JustNeverKeys<T> = {
+  [P in keyof T]: T[P] extends never ? P : never;
+}[keyof T];
