@@ -1,85 +1,47 @@
-import { DeepCurrent, OldMinusNew, Current } from "./model";
-
-// Define initial type and sub types
-interface V1 {
-  version: {
-    major: number;
-    minor: number;
-  };
-  analzyers: Analyzer[];
-}
-
-interface Analyzer {
-  id: number;
-  type: "serial" | "spi" | "can";
-}
-
-// Setup an example instance of the initialConfig
-const initialConfig: V1 = {
-  version: { major: 1, minor: 1 },
-  analzyers: [
-    {
-      id: 1,
-      type: "can"
-    }
-  ]
+/**
+ * Deep union types Initial and Change and give priority to Change.
+ *
+ * Change is defined as the difference between the Initial interface
+ * and the new version of the interface
+ *
+ * Currently Functions are not supported.
+ */
+export type DeepUnion<Initial, Change> = {
+  [KEY in keyof Current<Initial, Change>]: Current<
+    Initial,
+    Change
+  >[KEY] extends number
+    ? Current<Initial, Change>[KEY]
+    : Current<Initial, Change>[KEY] extends string
+    ? Current<Initial, Change>[KEY]
+    : Current<Initial, Change>[KEY] extends boolean
+    ? Current<Initial, Change>[KEY]
+    : Current<Initial, Change>[KEY] extends undefined
+    ? Current<Initial, Change>[KEY]
+    : KEY extends keyof Change
+    ? KEY extends keyof Initial
+      ? DeepUnion<Initial[KEY], Change[KEY]>
+      : Change[KEY]
+    : KEY extends keyof Initial
+    ? Initial[KEY]
+    : never;
 };
-
-// Define the changes as the delth between V1 and V2
-interface DeltaV2 {
-  version: never;
-  numChannels: {
-    analog: number;
-    digital: number;
-    meta: {
-      label: string;
-    };
-  };
-}
-
-// Deep merge the types to get V2
-type V2 = DeepCurrent<V1, DeltaV2>;
 
 /**
- * Transform a V1 config into a V2 config
- * @param {V1} config config
- * @returns {V2} a new V2 config
+ * Shallow union Initial and Change giving Change prioirty.
+ *
+ * If the type is defined on both Intial and Change the type from
+ * change will be used.
  */
-const initialToV2 = (config: V1): V2 => {
-  const { version, ...rest } = config;
-  return {
-    ...rest,
-    numChannels: {
-      analog: 0,
-      digital: 0,
-      meta: {
-        label: "hi"
-      }
-    }
-  };
+export type Current<Initial, Change> = NotNever<
+  OldMinusNew<Initial, Change> & Change
+>;
+
+export type OldMinusNew<Initial, Change> = {
+  [D in Exclude<keyof Initial, keyof Change>]: Initial[D];
 };
 
-interface DeltaV3 {
-  numChannels: {
-    meta: {
-      label: number;
-    };
-  };
-}
-
-type V3 = DeepCurrent<V2, DeltaV3>;
-
-const v2ToV3 = (config: V2): V3 => {
-  return {
-    ...config,
-    numChannels: {
-      ...config.numChannels,
-      meta: {
-        label: 1
-      }
-    }
-  };
-};
-
-// display the result
-console.log(v2ToV3(initialToV2(initialConfig)));
+export type NotNever<T> = Omit<T, JustNeverKeys<T>>;
+export type JustNeverKeys<T> = {
+  [P in keyof T]: T[P] extends never ? P : never;
+}[keyof T];
