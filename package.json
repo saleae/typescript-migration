@@ -1,7 +1,7 @@
 {
   "name": "typescript-migration",
   "version": "1.0.0",
-  "description": "",
+  "description": "Version TypeScript types with ease.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -9,12 +9,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jsnns/typescript-migration.git"
+    "url": "git+https://github.com/saleae/typescript-migration.git"
   },
   "author": "Jacob Sansbury <me@workbyjacob.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jsnns/typescript-migration/issues"
+    "url": "https://github.com/saleae/typescript-migration/issues"
   },
-  "homepage": "https://github.com/jsnns/typescript-migration#readme"
+  "homepage": "https://github.com/saleae/typescript-migration#readme"
 }
