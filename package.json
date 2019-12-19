@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/saleae/typescript-migration/issues"
   },
-  "homepage": "https://github.com/saleae/typescript-migration#readme"
+  "homepage": "https://github.com/saleae/typescript-migration#readme",
+  "devDependencies": {
+    "typescript": "^3.7.3"
+  }
 }

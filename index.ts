@@ -57,6 +57,9 @@ export type OldMinusNew<Initial, Change> = {
   [D in Exclude<keyof Initial, keyof Change>]: Initial[D];
 };
 
+/**
+ *  Remove keys that were set to never from the type
+ */
 export type NotNever<T> = Omit<T, JustNeverKeys<T>>;
 export type JustNeverKeys<T> = {
   [P in keyof T]: T[P] extends never ? P : never;
