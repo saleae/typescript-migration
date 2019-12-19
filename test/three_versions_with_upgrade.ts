@@ -1,4 +1,4 @@
-import { DeepUnion } from ".";
+import { DeepUnion } from "..";
 
 // Define initial type and sub types
 interface V1 {

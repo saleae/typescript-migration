@@ -6,26 +6,36 @@
  *
  * Currently Functions are not supported.
  */
-export type DeepUnion<Initial, Change> = {
-  [KEY in keyof Current<Initial, Change>]: Current<
-    Initial,
-    Change
-  >[KEY] extends number
-    ? Current<Initial, Change>[KEY]
-    : Current<Initial, Change>[KEY] extends string
-    ? Current<Initial, Change>[KEY]
-    : Current<Initial, Change>[KEY] extends boolean
-    ? Current<Initial, Change>[KEY]
-    : Current<Initial, Change>[KEY] extends undefined
-    ? Current<Initial, Change>[KEY]
-    : KEY extends keyof Change
-    ? KEY extends keyof Initial
-      ? DeepUnion<Initial[KEY], Change[KEY]>
-      : Change[KEY]
-    : KEY extends keyof Initial
-    ? Initial[KEY]
-    : never;
-};
+export type DeepUnion<Initial, Change> = Initial extends number
+  ? Change
+  : Initial extends boolean
+  ? Change
+  : Initial extends string
+  ? Change
+  : Initial extends undefined
+  ? Change
+  : {
+      [KEY in keyof Current<Initial, Change>]: Current<
+        Initial,
+        Change
+      >[KEY] extends number
+        ? Current<Initial, Change>[KEY]
+        : Current<Initial, Change>[KEY] extends string
+        ? Current<Initial, Change>[KEY]
+        : Current<Initial, Change>[KEY] extends boolean
+        ? Current<Initial, Change>[KEY]
+        : Current<Initial, Change>[KEY] extends undefined
+        ? Current<Initial, Change>[KEY]
+        : KEY extends keyof Change
+        ? KEY extends keyof Initial
+          ? DeepUnion<Initial[KEY], Change[KEY]>
+          : Change[KEY]
+        : KEY extends keyof Initial
+        ? Initial[KEY]
+        : never;
+    };
+
+type A = DeepUnion<number, { name: string }>;
 
 /**
  * Shallow union Initial and Change giving Change prioirty.
@@ -34,8 +44,12 @@ export type DeepUnion<Initial, Change> = {
  * change will be used.
  */
 export type Current<Initial, Change> = NotNever<
-  OldMinusNew<Initial, Change> & Change
+  OldMinusNew<Initial, Change> & New<Change>
 >;
+
+type New<Change> = {
+  [T in keyof Change]: Change[T];
+};
 
 export type OldMinusNew<Initial, Change> = {
   [D in Exclude<keyof Initial, keyof Change>]: Initial[D];
