@@ -28,14 +28,16 @@ export type DeepUnion<Initial, Change> = Initial extends number
         ? Current<Initial, Change>[KEY]
         : KEY extends keyof Change
         ? KEY extends keyof Initial
-          ? DeepUnion<Initial[KEY], Change[KEY]>
+          ? Current<Initial, Change>[KEY] extends any[]
+            ? DeepUnion<ArrayType<Initial[KEY]>, ArrayType<Change[KEY]>>[]
+            : DeepUnion<Initial[KEY], Change[KEY]>
           : Change[KEY]
         : KEY extends keyof Initial
         ? Initial[KEY]
         : never;
     };
 
-type A = DeepUnion<number, { name: string }>;
+type ArrayType<A> = A extends (infer T)[] ? T : A;
 
 /**
  * Shallow union Initial and Change giving Change prioirty.
