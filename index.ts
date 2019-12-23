@@ -14,29 +14,39 @@ export type DeepUnion<Initial, Change> = Initial extends number
   ? Change
   : Initial extends undefined
   ? Change
-  : {
-      [KEY in keyof Current<Initial, Change>]: Current<
-        Initial,
-        Change
-      >[KEY] extends number
-        ? Current<Initial, Change>[KEY]
-        : Current<Initial, Change>[KEY] extends string
-        ? Current<Initial, Change>[KEY]
-        : Current<Initial, Change>[KEY] extends boolean
-        ? Current<Initial, Change>[KEY]
-        : Current<Initial, Change>[KEY] extends undefined
-        ? Current<Initial, Change>[KEY]
-        : KEY extends keyof Change
-        ? KEY extends keyof Initial
-          ? Current<Initial, Change>[KEY] extends any[]
-            ? DeepUnion<ArrayType<Initial[KEY]>, ArrayType<Change[KEY]>>[]
-            : DeepUnion<Initial[KEY], Change[KEY]>
-          : Change[KEY]
-        : KEY extends keyof Initial
-        ? Initial[KEY]
-        : never;
-    };
+  : WithOptional<
+      {
+        [KEY in keyof Current<Initial, Change>]: Current<
+          Initial,
+          Change
+        >[KEY] extends number
+          ? Current<Initial, Change>[KEY]
+          : Current<Initial, Change>[KEY] extends string
+          ? Current<Initial, Change>[KEY]
+          : Current<Initial, Change>[KEY] extends boolean
+          ? Current<Initial, Change>[KEY]
+          : Current<Initial, Change>[KEY] extends undefined
+          ? Current<Initial, Change>[KEY]
+          : KEY extends keyof Change
+          ? KEY extends keyof Initial
+            ? Current<Initial, Change>[KEY] extends any[]
+              ? DeepUnion<ArrayType<Initial[KEY]>, ArrayType<Change[KEY]>>[]
+              : DeepUnion<Initial[KEY], Change[KEY]>
+            : Change[KEY]
+          : KEY extends keyof Initial
+          ? Initial[KEY]
+          : never;
+      },
+      OptionalPropertyOf<Current<Initial, Change>>
+    >;
 
+type OptionalPropertyOf<T extends object> = Exclude<
+  {
+    [K in keyof T]: T extends Record<K, T[K]> ? never : K;
+  }[keyof T],
+  undefined
+>;
+type WithOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 type ArrayType<A> = A extends (infer T)[] ? T : A;
 
 /**
