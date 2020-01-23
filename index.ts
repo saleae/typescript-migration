@@ -43,6 +43,11 @@ export type DeepUnion<Initial, Change> = Initial extends number
         : never;
     };
 
+// mapped type for readability
+export type ShallowUnion<Initial, Change> = {
+  [key in keyof Current<Initial, Change>]: Current<Initial, Change>[key];
+};
+
 type ArrayType<A> = A extends (infer T)[] ? T : A;
 
 /**
@@ -52,18 +57,15 @@ type ArrayType<A> = A extends (infer T)[] ? T : A;
  * change will be used.
  */
 export type Current<Initial, Change> = NotNever<
-  OldMinusNew<Initial, Change> & New<Change>
+  Optional<OldMinusNew<Initial, Change>> & New<Change>
 >;
 
-export type ShallowUnion<Initial, Change> = Current<Initial, Change>;
+type New<Change> = Change;
 
-type New<Change> = {
-  [T in keyof Change]: Change[T];
-};
-
-export type OldMinusNew<Initial, Change> = {
-  [D in Exclude<keyof Initial, keyof Change>]: Initial[D];
-};
+export type OldMinusNew<Initial, Change> = Pick<
+  Initial,
+  Exclude<keyof Initial, keyof Change>
+>;
 
 /**
  *  Remove keys that were set to never from the type
@@ -72,3 +74,14 @@ export type NotNever<T> = Omit<T, JustNeverKeys<T>>;
 export type JustNeverKeys<T> = {
   [P in keyof T]: T[P] extends never ? P : never;
 }[keyof T];
+
+type OptionalPropertyOf<T extends object> = Exclude<
+  {
+    [K in keyof T]: T extends Record<K, T[K]> ? never : K;
+  }[keyof T],
+  undefined
+>;
+type WithOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+type Optional<T> = T extends object
+  ? WithOptional<T, OptionalPropertyOf<T>>
+  : T;
